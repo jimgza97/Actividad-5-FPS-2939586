@@ -1,0 +1,32 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Bullet : MonoBehaviour
+{
+    public float speed = 20f; // Velocidad de la bala
+    public float lifeTime = 5f; // Tiempo antes de que la bala se destruya automáticamente
+    private Rigidbody rb; // Referencia al Rigidbody
+
+    private void Start()
+    {
+        rb = GetComponent<Rigidbody>(); // Obtiene el Rigidbody
+        rb.useGravity = false; // Desactiva la gravedad para que no caiga
+        rb.linearVelocity = transform.forward * speed; // Aplica velocidad hacia adelante según la dirección de la bala
+
+        Destroy(gameObject, lifeTime); // Destruye la bala después de un tiempo
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Target"))
+        {
+            print("Hit " + collision.gameObject.name + "!");
+            Destroy(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject); // Destruye la bala al impactar cualquier otro objeto
+        }
+    }
+}
