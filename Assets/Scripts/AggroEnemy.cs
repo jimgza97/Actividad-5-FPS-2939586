@@ -1,0 +1,70 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class AggroEnemy : MonoBehaviour
+{
+    public int health = 3; // Vidas del enemigo
+    private Renderer enemyRenderer; // Referencia al Renderer del enemigo
+    public float moveSpeed = 2f; // Velocidad de movimiento
+    public Transform player; // Referencia al jugador (para el movimiento)
+    public float aggroDistance = 3f; // Distancia para acercarse al jugador
+
+    private void Start()
+    {
+        enemyRenderer = GetComponent<Renderer>(); // Obtiene el Renderer para cambiar el color
+        UpdateColor(); // Establece el color inicial
+
+        // Busca al jugador si no está asignado
+        if (player == null)
+        {
+            player = GameObject.FindWithTag("Player").transform;
+        }
+    }
+
+    private void Update()
+    {
+        // Si el jugador está dentro del rango de aggro, mover al enemigo
+        if (Vector3.Distance(transform.position, player.position) <= aggroDistance)
+        {
+            MoveTowardsPlayer(); // Mover al enemigo hacia el jugador
+        }
+    }
+
+    // Método para mover al enemigo hacia el jugador
+    private void MoveTowardsPlayer()
+    {
+        // Mueve al enemigo de forma suave hacia la posición del jugador
+        transform.position = Vector3.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
+    }
+
+    public void TakeDamage()
+    {
+        health--; // Resta una vida al enemigo
+        UpdateColor(); // Cambia el color dependiendo de la vida restante
+
+        if (health <= 0)
+        {
+            Destroy(gameObject); // Destruye el enemigo si su vida llega a 0
+        }
+    }
+
+    private void UpdateColor()
+    {
+        if (health == 3)
+            enemyRenderer.material.color = Color.green; // Verde (3 vidas)
+        else if (health == 2)
+            enemyRenderer.material.color = Color.yellow; // Amarillo (2 vidas)
+        else if (health == 1)
+            enemyRenderer.material.color = Color.red; // Rojo (1 vida)
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Bullet")) // Detecta si es impactado por una bala
+        {
+            TakeDamage(); // Reduce la vida
+            Destroy(collision.gameObject); // Destruye la bala al impactar
+        }
+    }
+}

@@ -1,0 +1,33 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class FlyingEnemy : MonoBehaviour
+{
+    public Transform[] flightPath; // Array de puntos de la ruta
+    public float speed = 2f; // Velocidad de vuelo
+    private int currentPoint = 0; // Punto actual de la ruta
+
+    private void Update()
+    {
+        // Si hay puntos definidos en la ruta
+        if (flightPath.Length > 0)
+        {
+            // Mover el enemigo hacia el siguiente punto de la ruta
+            MoveAlongPath();
+        }
+    }
+
+    private void MoveAlongPath()
+    {
+        // Mueve al enemigo suavemente hacia el siguiente punto
+        transform.position = Vector3.MoveTowards(transform.position, flightPath[currentPoint].position, speed * Time.deltaTime);
+
+        // Si el enemigo está lo suficientemente cerca del punto actual, pasa al siguiente punto
+        if (Vector3.Distance(transform.position, flightPath[currentPoint].position) < 0.1f)
+        {
+            // Cambiar al siguiente punto en la ruta
+            currentPoint = (currentPoint + 1) % flightPath.Length; // Se asegura de que la ruta sea cíclica
+        }
+    }
+}
